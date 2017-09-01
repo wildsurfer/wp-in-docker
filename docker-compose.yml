@@ -1,0 +1,76 @@
+version: "2.1"
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy:0.6.0
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    restart: "always"
+    logging:
+      options:
+        max-size: 100m
+        max-file: "5"
+  comingsoon:
+    container_name: comingsoon
+    build: ./comingsoon
+    volumes:
+      - comingsoon:/var/www/html
+    restart: "always"
+    logging:
+      options:
+        max-size: 100m
+        max-file: "5"
+  dev-wordpress:
+    container_name: dev-wordpress
+    image: wordpress:4.8.1-php7.1-apache
+    environment:
+      - WORDPRESS_DB_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - WORDPRESS_DB_NAME=dev-wordpress
+    volumes:
+      - dev-wp-content:/var/www/html/wp-content
+    restart: "always"
+    depends_on:
+      - mysql
+    logging:
+      options:
+        max-size: 100m
+        max-file: "5"
+  sftp:
+    container_name: sftp
+    build: ./sftp/
+    ports:
+      - "22:22"
+    command: "dev:${DEV_SFTP_PASS}:33 comingsoon:${CS_SFTP_PASS}:100"
+    volumes:
+      - dev-wp-content:/var/www/html/dev-wordpress/wp-content
+      - comingsoon:/var/www/html/comingsoon
+    restart: "always"
+    privileged: true
+    depends_on:
+      - dev-wordpress
+    logging:
+      options:
+        max-size: 100m
+        max-file: "5"
+  mysql:
+    container_name: mysql
+    image: mysql:8.0.2
+    environment:
+      - MYSQL_ROOT_PASSWORD
+    volumes:
+      - mysql:/var/lib/mysql
+    restart: "always"
+    logging:
+      options:
+        max-size: 100m
+        max-file: "5"
+
+volumes:
+  dev-wp-content:
+    driver: local
+  mysql:  
+    driver: local
+  comingsoon:  
+    driver: local

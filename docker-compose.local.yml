@@ -1,0 +1,8 @@
+version: "2.1"
+services:
+  comingsoon:
+    environment:
+      - VIRTUAL_HOST=${DOMAIN_NAME}.local,www.${DOMAIN_NAME}.local
+  dev-wordpress:
+    environment:
+      - VIRTUAL_HOST=dev.${DOMAIN_NAME}.local,www.dev.${DOMAIN_NAME}.local
