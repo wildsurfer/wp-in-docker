@@ -41,7 +41,7 @@ services:
     container_name: sftp
     build: ./sftp/
     ports:
-      - "22:22"
+      - "2222:22"
     command: "dev:${DEV_SFTP_PASS}:33 comingsoon:${CS_SFTP_PASS}:100"
     volumes:
       - dev-wp-content:/var/www/html/dev-wordpress/wp-content
